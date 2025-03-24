@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using backend.Data;
+using backend.Dtos.LostItem;
+using backend.Mappers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
@@ -19,7 +21,7 @@ namespace backend.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var lostitems = _context.LostItems.ToList();
+            var lostitems = _context.LostItems.ToList().Select(s => s.ToLostItemDto());
 
             return Ok(lostitems);
         }
@@ -31,7 +33,16 @@ namespace backend.Controllers
             if (lostitem == null) {
                 return NotFound();
             }
-            return Ok(lostitem);
+            return Ok(lostitem.ToLostItemDto());
+        }
+
+        [HttpPost]
+        public IActionResult Create([FromBody] CreateLostItemDto lostItemDto)
+        {
+            var lostItemModel = lostItemDto.LostItemFromCreateDto();
+            _context.LostItems.Add(lostItemModel);
+            _context.SaveChanges();
+            return CreatedAtAction(nameof(GetById), new {id = lostItemModel.LostId}, lostItemModel.ToLostItemDto());
         }
     }
 }
