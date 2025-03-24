@@ -14,5 +14,6 @@ namespace backend.Data
 
         }
         public DbSet<User> Users { get; set; }
+        public DbSet<LostItem> LostItems {get; set;}
     }
 }
