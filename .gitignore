@@ -1,4 +1,4 @@
 /.vs
 /backend/bin
 /backend/obj
-/backend/Migrations/
+/backend/Migrations

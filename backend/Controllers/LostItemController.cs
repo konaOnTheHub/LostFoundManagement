@@ -44,5 +44,21 @@ namespace backend.Controllers
             _context.SaveChanges();
             return CreatedAtAction(nameof(GetById), new {id = lostItemModel.LostId}, lostItemModel.ToLostItemDto());
         }
+        [HttpPut]
+        [Route("{id}")]
+        public IActionResult Update([FromRoute] int id, [FromBody] UpdateLostItemDto updateDto)
+        {
+            var lostModel = _context.LostItems.FirstOrDefault(x => x.LostId == id);
+            if (lostModel == null) {
+                return NotFound();
+            }
+            lostModel.ItemName = updateDto.ItemName;
+            lostModel.Description = updateDto.Description;
+            lostModel.LostDate = updateDto.LostDate;
+
+            _context.SaveChanges();
+
+            return Ok(lostModel.ToLostItemDto());
+        }
     }
 }
