@@ -15,6 +15,6 @@ namespace backend.Models
         public DateTime LostDate {get; set;}
         public string Status {get; set;} = "Unclaimed"; //Found //Claimed //Unclaimed
         public int UserId {get; set;} //Foreign key to users table
-        public User? User {get; set;} //Navigation property
+        public User User {get; set;} = null!; //Navigation property
     }
 }
