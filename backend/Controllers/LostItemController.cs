@@ -8,6 +8,7 @@ using backend.Dtos.LostItem;
 using backend.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers
 {
@@ -21,16 +22,17 @@ namespace backend.Controllers
             _context = context;
         }
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var lostitems = _context.LostItems.ToList().Select(s => s.ToLostItemDto());
+            var lostitems = await _context.LostItems.ToListAsync();
+            var lostItemDto = lostitems.Select(s => s.ToLostItemDto());
 
             return Ok(lostitems);
         }
         [HttpGet("{id}")]
-        public IActionResult GetById([FromRoute] int id)
+        public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            var lostitem = _context.LostItems.Find(id);
+            var lostitem = await _context.LostItems.FindAsync(id);
 
             if (lostitem == null) {
                 return NotFound();
@@ -38,7 +40,7 @@ namespace backend.Controllers
             return Ok(lostitem.ToLostItemDto());
         }
         [HttpPost, Authorize]
-        public IActionResult Create([FromBody] CreateLostItemDto lostItemDto)
+        public async Task<IActionResult> Create([FromBody] CreateLostItemDto lostItemDto)
         {
             //Extract the NameIdentifier claim from the JWT token which is the PK of the user in the database
             var loggedUserString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -46,15 +48,15 @@ namespace backend.Controllers
             var loggedUserId = int.Parse(loggedUserString!);
             //Pass in the logged user ID to the mapper method to create the lost item model
             var lostItemModel = lostItemDto.LostItemFromCreateDto(loggedUserId);
-            _context.LostItems.Add(lostItemModel);
-            _context.SaveChanges();
+            await _context.LostItems.AddAsync(lostItemModel);
+            await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetById), new {id = lostItemModel.LostId}, lostItemModel.ToLostItemDto());
         }
         [HttpPut]
         [Route("{id}")]
-        public IActionResult Update([FromRoute] int id, [FromBody] UpdateLostItemDto updateDto)
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateLostItemDto updateDto)
         {
-            var lostModel = _context.LostItems.FirstOrDefault(x => x.LostId == id);
+            var lostModel = await _context.LostItems.FirstOrDefaultAsync(x => x.LostId == id);
             if (lostModel == null) {
                 return NotFound();
             }
@@ -62,7 +64,7 @@ namespace backend.Controllers
             lostModel.Description = updateDto.Description;
             lostModel.LostDate = updateDto.LostDate;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return Ok(lostModel.ToLostItemDto());
         }
