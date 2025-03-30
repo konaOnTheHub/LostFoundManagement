@@ -21,15 +21,15 @@ namespace backend.Mappers
                 UserId = lostItemModel.UserId,
             };
         }
-        public static LostItem LostItemFromCreateDto(this CreateLostItemDto lostItemDto)
+        public static LostItem LostItemFromCreateDto(this CreateLostItemDto lostItemDto, int loggedUserId)
         {
             return new LostItem
             {
                 ItemName = lostItemDto.ItemName,
                 Description = lostItemDto.Description,
-                LostDate = lostItemDto.LostDate,
+                LostDate = DateTime.Now,
                 Status = "Unclaimed",
-                UserId = lostItemDto.UserId,
+                UserId = loggedUserId,
             };
         }
     }

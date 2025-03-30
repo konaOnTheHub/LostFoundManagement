@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using backend.Data;
 using backend.Dtos.LostItem;
 using backend.Mappers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
@@ -35,11 +37,15 @@ namespace backend.Controllers
             }
             return Ok(lostitem.ToLostItemDto());
         }
-
-        [HttpPost]
+        [HttpPost, Authorize]
         public IActionResult Create([FromBody] CreateLostItemDto lostItemDto)
         {
-            var lostItemModel = lostItemDto.LostItemFromCreateDto();
+            //Extract the NameIdentifier claim from the JWT token which is the PK of the user in the database
+            var loggedUserString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //Convert to INT as claims are stored in string
+            var loggedUserId = int.Parse(loggedUserString!);
+            //Pass in the logged user ID to the mapper method to create the lost item model
+            var lostItemModel = lostItemDto.LostItemFromCreateDto(loggedUserId);
             _context.LostItems.Add(lostItemModel);
             _context.SaveChanges();
             return CreatedAtAction(nameof(GetById), new {id = lostItemModel.LostId}, lostItemModel.ToLostItemDto());
