@@ -84,5 +84,18 @@ namespace backend.Controllers
 
             return Ok(lostModel.ToLostItemDto());
         }
+        [HttpPut, Authorize(Roles = "admin")]
+        [Route("updateStatus/{id}")]
+        public async Task<IActionResult> UpdateStatus([FromRoute] int id, [FromBody] UpdateLostItemStatusDto updateDto)
+        {
+            var lostModel = await _context.LostItems.FirstOrDefaultAsync(x => x.LostId == id);
+            if (lostModel == null) {
+                return NotFound();
+            }
+            lostModel.Status = updateDto.Status;
+            await _context.SaveChangesAsync();
+
+            return Ok(lostModel.ToLostItemDto());
+        }
     }
 }
