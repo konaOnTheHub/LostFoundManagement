@@ -9,7 +9,7 @@ namespace backend.Dtos.LostItem
     {
         public string ItemName {get; set;} = string.Empty;
         public string Description {get; set;} = string.Empty;
-        public DateTime LostDate {get; set;}
+        public DateOnly LostDate {get; set;}
         
     }
 }

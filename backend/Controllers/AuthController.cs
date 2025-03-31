@@ -17,7 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace backend.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("backend/[controller]")]
     public class AuthController(IAuthService authService) : ControllerBase
     {
         [HttpPost("register")]

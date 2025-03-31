@@ -14,6 +14,7 @@ namespace backend.Models
         //Claimant FK
         public int UserId {get; set;}
         public User User {get; set;} = null!;
+        public DateOnly ClaimDate {get; set;}
         //FoundItem FK
         public int FoundId {get; set;}
         public FoundItem FoundItem {get; set;} = null!;

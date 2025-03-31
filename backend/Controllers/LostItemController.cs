@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using backend.Data;
 using backend.Dtos.LostItem;
 using backend.Mappers;
+using backend.Services.JWTClaim;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,13 +22,25 @@ namespace backend.Controllers
         {
             _context = context;
         }
-        [HttpGet]
+        //Only admins can see all lost items
+        [HttpGet, Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAll()
         {
             var lostitems = await _context.LostItems.ToListAsync();
             var lostItemDto = lostitems.Select(s => s.ToLostItemDto());
 
             return Ok(lostitems);
+        }
+        //Anyone can see their own lost items
+        [HttpGet("myLostItems"), Authorize]
+        public async Task<IActionResult> GetAllUserLostItems()
+        {
+            //Extract UserId from the JWT token using service
+            var loggedUserId = ExtractClaimService.ExtractNameIdentifier(User);
+            var lostitems = await _context.LostItems.Where(x => x.UserId == loggedUserId).ToListAsync();
+            var lostItemDto = lostitems.Select(s => s.ToLostItemDto());
+
+            return Ok(lostItemDto);
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
@@ -42,23 +55,26 @@ namespace backend.Controllers
         [HttpPost, Authorize]
         public async Task<IActionResult> Create([FromBody] CreateLostItemDto lostItemDto)
         {
-            //Extract the NameIdentifier claim from the JWT token which is the PK of the user in the database
-            var loggedUserString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            //Convert to INT as claims are stored in string
-            var loggedUserId = int.Parse(loggedUserString!);
+            //Extract UserId from the JWT token using service
+            var loggedUserId = ExtractClaimService.ExtractNameIdentifier(User);
             //Pass in the logged user ID to the mapper method to create the lost item model
             var lostItemModel = lostItemDto.LostItemFromCreateDto(loggedUserId);
             await _context.LostItems.AddAsync(lostItemModel);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetById), new {id = lostItemModel.LostId}, lostItemModel.ToLostItemDto());
         }
-        [HttpPut]
+        [HttpPut, Authorize]
         [Route("{id}")]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateLostItemDto updateDto)
+        public async Task<IActionResult> UpdateUser([FromRoute] int id, [FromBody] UpdateLostItemDto updateDto)
         {
+            //Extract UserId from the JWT token using service
+            var loggedUserId = ExtractClaimService.ExtractNameIdentifier(User);
             var lostModel = await _context.LostItems.FirstOrDefaultAsync(x => x.LostId == id);
             if (lostModel == null) {
                 return NotFound();
+            }
+            if (lostModel.UserId != loggedUserId) {
+                return Unauthorized("You are not authorized to update this lost item.");
             }
             lostModel.ItemName = updateDto.ItemName;
             lostModel.Description = updateDto.Description;

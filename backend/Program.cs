@@ -1,6 +1,7 @@
 using System.Text;
 using backend.Data;
 using backend.Services;
+using backend.Services.JWTClaim;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -41,6 +42,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 //Add services to program
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ExtractClaimService>();
 
 var app = builder.Build();
 
