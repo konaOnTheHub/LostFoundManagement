@@ -17,7 +17,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 //Add database context to program
 builder.Services.AddDbContext<ApplicationDbContext>(options =>{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
