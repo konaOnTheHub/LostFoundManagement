@@ -7,6 +7,6 @@ namespace backend.Dtos.LostItem
 {
     public class UpdateLostItemStatusDto
     {
-        public string Status { get; set; } = string.Empty; // "Unclaimed" // "Claimed" // "Found"
+        public string Status { get; set; } = string.Empty; // "Lost" // "Found" // "Claimed"
     }
 }

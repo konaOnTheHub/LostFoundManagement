@@ -27,8 +27,8 @@ namespace backend.Mappers
             {
                 ItemName = lostItemDto.ItemName,
                 Description = lostItemDto.Description,
-                LostDate = DateOnly.FromDateTime(DateTime.Now),
-                Status = "Unclaimed",
+                LostDate = lostItemDto.LostDate,
+                Status = "Lost",
                 UserId = loggedUserId,
             };
         }

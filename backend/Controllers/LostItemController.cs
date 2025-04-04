@@ -97,5 +97,6 @@ namespace backend.Controllers
 
             return Ok(lostModel.ToLostItemDto());
         }
+        //todo - add authorization to delete lost item
     }
 }
