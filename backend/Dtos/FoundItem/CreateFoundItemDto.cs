@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace backend.Dtos.LostItem
+namespace backend.Dtos.FoundItem
 {
-    public class UpdateLostItemDto
+    public class CreateFoundItemDto
     {
         public string ItemName {get; set;} = string.Empty;
         public string Description {get; set;} = string.Empty;
-        public DateOnly LostDate {get; set;}
-        
+        public DateOnly FoundDate {get; set;}
     }
 }

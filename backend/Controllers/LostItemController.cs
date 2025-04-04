@@ -42,7 +42,7 @@ namespace backend.Controllers
 
             return Ok(lostItemDto);
         }
-        [HttpGet("{id}")]
+        [HttpGet("{id}"), Authorize]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             var lostitem = await _context.LostItems.FindAsync(id);
@@ -65,7 +65,7 @@ namespace backend.Controllers
         }
         [HttpPut, Authorize]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateUser([FromRoute] int id, [FromBody] UpdateLostItemDto updateDto)
+        public async Task<IActionResult> UpdateUser([FromRoute] int id, [FromBody] CreateLostItemDto updateDto)
         {
             //Extract UserId from the JWT token using service
             var loggedUserId = ExtractClaimService.ExtractNameIdentifier(User);
