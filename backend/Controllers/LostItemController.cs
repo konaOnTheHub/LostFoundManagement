@@ -98,5 +98,27 @@ namespace backend.Controllers
             return Ok(lostModel.ToLostItemDto());
         }
         //todo - add authorization to delete lost item
+        [HttpDelete, Authorize]
+        [Route("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            //Extract UserId from the JWT token using service
+            var loggedUserId = ExtractClaimService.ExtractNameIdentifier(User);
+            var lostitem = await _context.LostItems.FindAsync(id);
+            if (lostitem == null) {
+                return NotFound();
+            }
+            //Check if the logged user is the owner of the lost item
+            if (lostitem.UserId != loggedUserId) {
+                return Unauthorized("You are not authorized to delete this lost item.");
+            }
+            //Check if the lost item is already claimed or found
+            if (lostitem.Status == "Claimed" || lostitem.Status == "Found") {
+                return BadRequest("You cannot delete a lost item that is already claimed or found.");
+            }
+            _context.LostItems.Remove(lostitem);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
     }
 }
